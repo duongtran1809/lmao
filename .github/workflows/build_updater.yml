@@ -1,0 +1,23 @@
+name: Build Windows Updater
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-updater:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Compile Inno Setup Updater
+      run: iscc updater.iss
+
+    - name: Upload Updater EXE
+      uses: actions/upload-artifact@v3
+      with:
+        name: TomatoAnalytics_Model_Update
+        path: Output/TomatoAnalytics_Model_Update.exe
