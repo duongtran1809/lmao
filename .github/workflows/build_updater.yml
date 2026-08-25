@@ -11,13 +11,13 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Compile Inno Setup Updater
       run: iscc updater.iss
 
     - name: Upload Updater EXE
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: TomatoAnalytics_Model_Update
         path: Output/TomatoAnalytics_Model_Update.exe
