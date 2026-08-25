@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích Cà Chua</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Pantone Colors */
+            --incaberry: #E4C478;
+            --cappuccino: #EBD7C7;
+            --cinnamon: #994C34;
+            --gold: #AA8C4A;
+            --forest: #1C3F2D;
+            --olive: #9B9A44;
+            
+            --bg-solid: #F3F4F6;
+            --container-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #374151;
+            --border-color: #D1D5DB;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-solid);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--container-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--forest);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            color: var(--cinnamon);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        input[type="text"], input[type="number"], input[type="file"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            background-color: #F9FAFB;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--forest);
+            background-color: #FFFFFF;
+        }
+
+        input[type="file"] {
+            background-color: #FFFFFF;
+            cursor: pointer;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        button {
+            background-color: var(--forest);
+            color: white;
+            border: 2px solid var(--forest);
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: #122a1e;
+            border-color: #122a1e;
+        }
+        
+        button.secondary {
+            background-color: var(--cinnamon);
+            border-color: var(--cinnamon);
+        }
+        button.secondary:hover {
+            background-color: #7a3a28;
+            border-color: #7a3a28;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 700;
+            color: var(--container-bg);
+            background-color: var(--forest);
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #F9FAFB;
+        }
+
+        tbody tr:hover {
+            background-color: #F3F4F6;
+        }
+
+        #image-preview {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+            border: 2px solid var(--border-color);
+        }
+
+        .loader {
+            display: none;
+            border: 3px solid #E5E7EB;
+            border-top: 3px solid var(--forest);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .help-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: -4px;
+            margin-bottom: 15px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .verbose-log {
+            margin-top: 25px;
+            font-size: 14px;
+            font-family: monospace;
+            background: #111827;
+            color: #10B981;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 2px solid var(--border-color);
+            display: none;
+        }
+        
+        .verbose-log div {
+            padding: 4px 0;
+            border-bottom: 1px solid #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 data-i18n="app_title">Phân tích Cà Chua</h1>
+            <select id="lang_switcher" onchange="switchLanguage(this.value)" style="padding: 8px; border-radius: 6px; border: 2px solid var(--border-color); font-weight: 600;">
+                <option value="vi">🇻🇳 Tiếng Việt</option>
+                <option value="en">🇬🇧 English</option>
+            </select>
+        </div>
+
+        
+        <div class="section">
+            <h2 data-i18n="sec1_title">1. Cài đặt ước tính (Chỉ dành cho Chế độ Thư mục)</h2>
+            <div class="grid-2">
+                <div>
+                    <label data-i18n="lbl_sample">Số lượng mẫu (n)</label>
+                    <input type="number" id="sample_n" value="1" min="1">
+                </div>
+                <div>
+                    <label data-i18n="lbl_total_trees">Tổng số cây trong vườn (N)</label>
+                    <input type="number" id="total_n" value="100" min="1">
+                </div>
+                <div>
+                    <label data-i18n="lbl_avg_weight">Trọng lượng trung bình 1 quả (g)</label>
+                    <input type="number" id="avg_weight" value="150" min="1">
+                </div>
+            </div>
+
+            <h2 style="margin-top: 20px;" data-i18n="harvest_time">Thời gian thu hoạch</h2>
+            <div class="grid-2">
+                <div>
+                    <label data-i18n="cls_ripe">Cà chua chín</label>
+                    <input type="text" id="date_ripe" value="0 Ngày (Đã sẵn sàng)">
+                </div>
+                <div>
+                    <label data-i18n="cls_near">Cà chua gần chín</label>
+                    <input type="text" id="date_near" value="3-5 Ngày">
+                </div>
+                <div>
+                    <label data-i18n="cls_unripe">Cà chua xanh</label>
+                    <input type="text" id="date_unripe" value="10-15 Ngày">
+                </div>
+                <div>
+                    <label data-i18n="cls_fert">Hoa đã thụ phấn</label>
+                    <input type="text" id="date_fert" value="30-40 Ngày">
+                </div>
+                <div>
+                    <label data-i18n="cls_unfert">Hoa chưa thụ phấn</label>
+                    <input type="text" id="date_unfert" value="Không xác định">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 data-i18n="sec2_title">2. Phân tích</h2>
+            
+            <div style="margin-bottom: 30px;">
+                <label data-i18n="lbl_single_mode">Chế độ Ảnh Đơn: Đếm số lượng trên 1 ảnh</label>
+                <span class="help-text" data-i18n="help_single">Nhận diện và đếm số lượng, không hiển thị ước tính.</span>
+                <input type="file" id="image_upload" accept="image/*">
+                <button onclick="visualizeUpload()" data-i18n="btn_analyze_img">Phân tích ảnh</button>
+                <span id="loader-img" class="loader"></span>
+            </div>
+
+            <div style="padding-top: 20px; border-top: 1px dashed var(--border-color);">
+                <label data-i18n="lbl_folder_mode">Chế độ Thư mục: Đếm toàn bộ thư mục & Ước tính sản lượng</label>
+                <span class="help-text" data-i18n="help_folder">Bấm vào nút chọn thư mục, ứng dụng sẽ quét từng ảnh, hiển thị nhật ký phân tích chi tiết và ước tính tổng.</span>
+                <input type="file" id="folder_upload" webkitdirectory directory multiple>
+                <button onclick="countFolderLocal()" data-i18n="btn_analyze_folder">Phân tích thư mục</button>
+                <span id="loader-folder" class="loader"></span>
+            </div>
+        </div>
+
+        <div class="section" id="results-panel" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="result-title" style="margin: 0; border: none;" data-i18n="results_title">Kết quả</h2>
+                <button onclick="downloadExcel()" class="secondary" style="margin: 0;" data-i18n="btn_save_excel">💾 Lưu Kết Quả (Excel)</button>
+            </div>
+            
+            <img id="image-preview" src="" alt="Kết quả nhận diện">
+            
+            <div id="progress-text" style="font-size: 14px; font-weight: 500; color: var(--cinnamon); display: none;">... 0 / 0</div>
+            
+            <table id="results-table">
+                <thead id="results-head">
+                    <!-- Sẽ được điền bằng JS tuỳ theo chế độ -->
+                </thead>
+                <tbody id="results-body">
+                </tbody>
+            </table>
+            
+            <div id="verbose-log" class="verbose-log"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:5123/api";
+        
+        const I18N = {
+            vi: {
+                app_title: "Phân tích Cà Chua",
+                sec1_title: "1. Cài đặt ước tính (Chỉ dành cho Chế độ Thư mục)",
+                lbl_sample: "Số lượng mẫu (n)",
+                lbl_total_trees: "Tổng số cây trong vườn (N)",
+                lbl_avg_weight: "Trọng lượng trung bình 1 quả (g)",
+                harvest_time: "Thời gian thu hoạch",
+                cls_ripe: "Cà chua chín",
+                cls_near: "Cà chua gần chín",
+                cls_unripe: "Cà chua xanh",
+                cls_fert: "Hoa đã thụ phấn",
+                cls_unfert: "Hoa chưa thụ phấn",
+                sec2_title: "2. Phân tích",
+                lbl_single_mode: "Chế độ Ảnh Đơn: Đếm số lượng trên 1 ảnh",
+                help_single: "Nhận diện và đếm số lượng, không hiển thị ước tính.",
+                btn_analyze_img: "Phân tích ảnh",
+                lbl_folder_mode: "Chế độ Thư mục: Đếm toàn bộ thư mục & Ước tính sản lượng",
+                help_folder: "Bấm vào nút chọn thư mục, ứng dụng sẽ quét từng ảnh, hiển thị nhật ký phân tích chi tiết và ước tính tổng.",
+                btn_analyze_folder: "Phân tích thư mục",
+                results_title: "Kết quả",
+                btn_save_excel: "💾 Lưu Kết Quả (Excel)",
+                tbl_class: "Phân loại",
+                tbl_harvest: "Thời gian thu hoạch",
+                tbl_count: "Tổng đếm được (Mẫu)",
+                tbl_est: "Ước tính tổng (Vườn)",
+                tbl_weight: "Tổng khối lượng (kg)",
+                tbl_qty: "Số lượng",
+                processing: "Đang xử lý...",
+                log_verbose: "Nhật ký chi tiết (Verbose):",
+                err_no_dir: "Vui lòng chọn một thư mục chứa ảnh.",
+                err_no_img: "Không tìm thấy tệp ảnh nào trong thư mục này.",
+                err_upload: "Vui lòng chọn một tập tin ảnh.",
+                err_server: "Không thể kết nối đến máy chủ.",
+                val_date_ripe: "0 Ngày (Đã sẵn sàng)",
+                val_date_near: "3-5 Ngày",
+                val_date_unripe: "10-15 Ngày",
+                val_date_fert: "30-40 Ngày",
+                val_date_unfert: "Không xác định",
+                done: "Đã hoàn tất! Xử lý thành công",
+                res_folder: "Kết quả Thư mục",
+                res_single: "Kết quả Ảnh Đơn",
+            },
+            en: {
+                app_title: "Tomato Analytics",
+                sec1_title: "1. Estimation Settings (Folder Mode Only)",
+                lbl_sample: "Sample Size (n)",
+                lbl_total_trees: "Total Plants (N)",
+                lbl_avg_weight: "Avg Weight per Fruit (g)",
+                harvest_time: "Harvest Time",
+                cls_ripe: "Ripe Tomatoes",
+                cls_near: "Near-Ripe Tomatoes",
+                cls_unripe: "Unripe Tomatoes",
+                cls_fert: "Fertilized Blossoms",
+                cls_unfert: "Unfertilized Blossoms",
+                sec2_title: "2. Analysis",
+                lbl_single_mode: "Single Image Mode: Count objects in 1 image",
+                help_single: "Detects and counts objects, no estimations shown.",
+                btn_analyze_img: "Analyze Image",
+                lbl_folder_mode: "Folder Mode: Count entire folder & Estimate yield",
+                help_folder: "Select a folder to scan each image, display a detailed log and total estimations.",
+                btn_analyze_folder: "Analyze Folder",
+                results_title: "Results",
+                btn_save_excel: "💾 Save Results (Excel)",
+                tbl_class: "Classification",
+                tbl_harvest: "Harvest Time",
+                tbl_count: "Count (Sample)",
+                tbl_est: "Est. Total (Farm)",
+                tbl_weight: "Total Weight (kg)",
+                tbl_qty: "Quantity",
+                processing: "Processing...",
+                log_verbose: "Verbose Log:",
+                err_no_dir: "Please select a folder containing images.",
+                err_no_img: "No image files found in this folder.",
+                err_upload: "Please select an image file.",
+                err_server: "Unable to connect to server.",
+                val_date_ripe: "0 Days (Ready)",
+                val_date_near: "3-5 Days",
+                val_date_unripe: "10-15 Days",
+                val_date_fert: "30-40 Days",
+                val_date_unfert: "Unknown",
+                done: "Done! Successfully processed",
+                res_folder: "Folder Results",
+                res_single: "Single Image Results",
+            }
+        };
+
+        let currentLang = 'vi';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // Update static elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (I18N[lang][key]) {
+                    el.innerHTML = I18N[lang][key];
+                }
+            });
+            
+            // Update default input values if they haven't been modified heavily
+            const valMap = {
+                'date_ripe': 'val_date_ripe',
+                'date_near': 'val_date_near',
+                'date_unripe': 'val_date_unripe',
+                'date_fert': 'val_date_fert',
+                'date_unfert': 'val_date_unfert'
+            };
+            for(let id in valMap) {
+                const el = document.getElementById(id);
+                // Simple logic: if it matches either vi or en default, switch it
+                if (el.value === I18N['vi'][valMap[id]] || el.value === I18N['en'][valMap[id]]) {
+                    el.value = I18N[lang][valMap[id]];
+                }
+            }
+            
+            // If results are showing, we might want to tell them to re-run, but for now just title
+            const titleEl = document.getElementById('result-title');
+            if (titleEl.innerText.includes('Thư mục') || titleEl.innerText.includes('Folder')) {
+                titleEl.innerText = I18N[lang].res_folder;
+            } else if (titleEl.innerText.includes('Ảnh') || titleEl.innerText.includes('Image')) {
+                titleEl.innerText = I18N[lang].res_single;
+            }
+        }
+        
+        function translateClass(clsVi) {
+            if (currentLang === 'vi') return clsVi;
+            const mapping = {
+                'Cà chua chín': 'Ripe Tomatoes', 
+                'Cà chua gần chín': 'Near-Ripe Tomatoes', 
+                'Cà chua xanh': 'Unripe Tomatoes', 
+                'Hoa đã thụ phấn': 'Fertilized Blossoms', 
+                'Hoa chưa thụ phấn': 'Unfertilized Blossoms'
+            };
+            return mapping[clsVi] || clsVi;
+        }
+
+        const CLASSES = [
+            'Cà chua chín', 
+            'Cà chua gần chín', 
+            'Cà chua xanh', 
+            'Hoa đã thụ phấn', 
+            'Hoa chưa thụ phấn'
+        ];
+
+        function getDatesMap() {
+            return {
+                'Cà chua chín': document.getElementById('date_ripe').value,
+                'Cà chua gần chín': document.getElementById('date_near').value,
+                'Cà chua xanh': document.getElementById('date_unripe').value,
+                'Hoa đã thụ phấn': document.getElementById('date_fert').value,
+                'Hoa chưa thụ phấn': document.getElementById('date_unfert').value
+            };
+        }
+
+        async function countFolderLocal() {
+            const fileInput = document.getElementById('folder_upload');
+            const files = fileInput.files;
+            
+            if(files.length === 0) {
+                alert(I18N[currentLang].err_no_dir);
+                return;
+            }
+            
+            const loader = document.getElementById('loader-folder');
+            loader.style.display = 'inline-block';
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('results-panel').style.display = 'block';
+            document.getElementById('result-title').innerText = I18N[currentLang].res_folder;
+            
+            const progress = document.getElementById('progress-text');
+            progress.style.display = 'block';
+            
+            const logBox = document.getElementById('verbose-log');
+            logBox.style.display = 'block';
+            logBox.innerHTML = `<strong>${I18N[currentLang].log_verbose}</strong><br>`;
+            
+            // Render table header for Folder Mode
+            document.getElementById('results-head').innerHTML = `
+                <tr>
+                    <th>${I18N[currentLang].tbl_class}</th>
+                    <th>${I18N[currentLang].tbl_harvest}</th>
+                    <th>${I18N[currentLang].tbl_count}</th>
+                    <th>${I18N[currentLang].tbl_est}</th>
+                    <th>${I18N[currentLang].tbl_weight}</th>
+                </tr>
+            `;
+            document.getElementById('results-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">${I18N[currentLang].processing}</td></tr>`;
+
+            // Filter image files
+            const imageFiles = [];
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].type.match('image.*')) {
+                    imageFiles.push(files[i]);
+                }
+            }
+
+            if (imageFiles.length === 0) {
+                alert(I18N[currentLang].err_no_img);
+                loader.style.display = 'none';
+                return;
+            }
+
+            let totalCounts = {};
+            CLASSES.forEach(cls => totalCounts[cls] = 0);
+
+            for (let i = 0; i < imageFiles.length; i++) {
+                const file = imageFiles[i];
+                progress.innerText = `${I18N[currentLang].processing} ${i + 1} / ${imageFiles.length} (${file.name})`;
+                
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                try {
+                    const res = await fetch(`${API_BASE}/count_single_upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    
+                    if (!data.error) {
+                        let logEntry = `[${file.name}] `;
+                        CLASSES.forEach(cls => {
+                            const c = data.counts[cls] || 0;
+                            totalCounts[cls] += c;
+                            if (c > 0) logEntry += `${translateClass(cls)}: ${c} | `;
+                        });
+                        logBox.innerHTML += `<div>${logEntry}</div>`;
+                        logBox.scrollTop = logBox.scrollHeight;
+                        
+                        renderFolderTable(totalCounts);
+                    }
+                } catch (err) {
+                    logBox.innerHTML += `<div style="color:red;">[${file.name}] Error!</div>`;
+                }
+            }
+            
+            progress.innerText = `${I18N[currentLang].done} ${imageFiles.length} images.`;
+            loader.style.display = 'none';
+        }
+
+        async function visualizeUpload() {
+            const fileInput = document.getElementById('image_upload');
+            if (fileInput.files.length === 0) {
+                alert(I18N[currentLang].err_upload);
+                return;
+            }
+
+            const loader = document.getElementById('loader-img');
+            loader.style.display = 'inline-block';
+            
+            document.getElementById('results-panel').style.display = 'block';
+            document.getElementById('result-title').innerText = I18N[currentLang].res_single;
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('progress-text').style.display = 'none';
+            document.getElementById('verbose-log').style.display = 'none';
+            
+            // Render table header for Single Image Mode
+            document.getElementById('results-head').innerHTML = `
+                <tr>
+                    <th>${I18N[currentLang].tbl_class}</th>
+                    <th>${I18N[currentLang].tbl_qty}</th>
+                </tr>
+            `;
+            document.getElementById('results-body').innerHTML = `<tr><td colspan="2" style="text-align:center;">${I18N[currentLang].processing}</td></tr>`;
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            try {
+                const res = await fetch(`${API_BASE}/visualize_upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                loader.style.display = 'none';
+                
+                if (data.error) {
+                    alert("Lỗi: " + data.error);
+                    return;
+                }
+                
+                const imgEl = document.getElementById('image-preview');
+                imgEl.src = data.image;
+                imgEl.style.display = 'block';
+                
+                renderSingleImageTable(data.counts);
+            } catch (err) {
+                loader.style.display = 'none';
+                alert(I18N[currentLang].err_server);
+            }
+        }
+
+        function renderSingleImageTable(counts) {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+            
+            CLASSES.forEach(cls => {
+                const count = counts[cls] || 0;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${translateClass(cls)}</strong></td>
+                    <td>${count}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderFolderTable(counts) {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+            
+            const datesMap = getDatesMap();
+            const n_sample = parseFloat(document.getElementById('sample_n').value) || 1;
+            const N_total = parseFloat(document.getElementById('total_n').value) || 1;
+            const avg_weight_g = parseFloat(document.getElementById('avg_weight').value) || 150;
+
+            CLASSES.forEach(cls => {
+                const count = counts[cls] || 0;
+                let estimated = Math.round((count / n_sample) * N_total);
+                
+                let weight_kg = ((estimated * avg_weight_g) / 1000).toFixed(2);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${translateClass(cls)}</strong></td>
+                    <td>${datesMap[cls] || 'Không xác định'}</td>
+                    <td>${count}</td>
+                    <td>${estimated}</td>
+                    <td>${weight_kg}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function downloadExcel() {
+            const table = document.getElementById("results-table");
+            let headers = [];
+            let data = [];
+            
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = [], cols = table.rows[i].querySelectorAll("td, th");
+                for (let j = 0; j < cols.length; j++) {
+                    let cellText = cols[j].innerText.trim();
+                    row.push(cellText);
+                }
+                if (i === 0) headers = row;
+                else data.push(row);
+            }
+
+            const loader = document.getElementById('loader-img') || document.getElementById('loader-folder');
+            if (loader) loader.style.display = 'inline-block';
+            
+            try {
+                const res = await fetch(`${API_BASE}/export_excel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ headers: headers, data: data })
+                });
+                
+                if (!res.ok) throw new Error("Export failed");
+                
+                const blob = await res.blob();
+                const date = new Date();
+                const defaultName = "Ket_Qua_Ca_Chua_" + date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate() + ".xlsx";
+                
+                try {
+                    if (window.showSaveFilePicker) {
+                        const handle = await window.showSaveFilePicker({
+                            suggestedName: defaultName,
+                            types: [{
+                                description: 'Excel File',
+                                accept: {'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']},
+                            }],
+                        });
+                        const writable = await handle.createWritable();
+                        await writable.write(blob);
+                        await writable.close();
+                        if (loader) loader.style.display = 'none';
+                        return;
+                    }
+                } catch (err) {
+                    if (loader) loader.style.display = 'none';
+                    if (err.name !== 'AbortError') console.error(err);
+                    return;
+                }
+
+                // Fallback
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", defaultName);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                alert("Lỗi khi tạo file Excel.");
+            }
+            if (loader) loader.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
